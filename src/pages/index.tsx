@@ -6,7 +6,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
 const schema = z.object({
-  requirement: z.string().min(1, { message: "Please enter your requirement" }),
+  expression: z.string().min(1, { message: "Cron expression is required" }),
 });
 type Inputs = z.infer<typeof schema>;
 
@@ -67,8 +67,8 @@ export default function Home() {
       </Head>
       <main className="w-full pt-32 pb-32">
         <div className="container flex max-w-6xl flex-col items-center justify-center gap-10">
-          <h1 className="max-w-2xl text-center text-3xl font-bold leading-tight text-gray-50 sm:text-5xl sm:leading-tight">
-            Explaining cron expressions and generating them for you
+          <h1 className="max-w-3xl text-center text-3xl font-bold leading-tight text-gray-50 sm:text-5xl sm:leading-tight">
+            Explaining and generating cron expressions for you
           </h1>
           <form
             aria-label="form for finding NPM packages"
@@ -77,22 +77,17 @@ export default function Home() {
           >
             <fieldset className="grid gap-5">
               <label
-                htmlFor="requirement"
-                className="flex items-center gap-2.5 text-sm font-medium sm:text-base"
+                htmlFor="expression"
+                className="text-sm font-medium sm:text-base"
               >
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-gray-500 text-xs font-bold text-white sm:text-sm">
-                  1
-                </span>
-                <span className="flex-1 text-gray-50">
-                  Enter your requirement
-                </span>
+                Enter your cron expression
               </label>
-              <textarea
-                id="requirement"
-                rows={2}
-                className="w-full rounded-md border-gray-400 bg-transparent px-4 pt-2.5 text-base text-gray-50 transition-colors placeholder:text-gray-400 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-800"
-                placeholder="e.g. Time"
-                {...register("requirement")}
+              <input
+                type="text"
+                id="expression"
+                className="w-full rounded-md border-gray-400 bg-transparent px-4 pt-2.5 text-base text-gray-50 transition-colors placeholder:text-gray-400 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="* * * * *"
+                {...register("expression")}
                 onKeyDown={(e) => {
                   if (!formState.isValid || isLoading) return;
                   if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
@@ -100,9 +95,9 @@ export default function Home() {
                   }
                 }}
               />
-              {formState.errors.requirement ? (
+              {formState.errors.expression ? (
                 <p className="-mt-1.5 text-sm font-medium text-red-500">
-                  {formState.errors.requirement.message}
+                  {formState.errors.expression.message}
                 </p>
               ) : null}
             </fieldset>
