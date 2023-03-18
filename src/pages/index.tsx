@@ -22,16 +22,16 @@ export default function Home() {
             <Link
               aria-label="Navigate to explore page"
               href="/explain"
-              className="flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-5 py-2.5 text-center text-base font-medium shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:pointer-events-none disabled:opacity-70"
+              className="flex h-10 items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-center text-base font-medium shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:pointer-events-none disabled:opacity-70"
             >
-              Explain expression
+              Explain cron
             </Link>
             <Link
               aria-label="Navigate to generate page"
               href="/generate"
-              className="flex items-center justify-center rounded-md border border-gray-400 bg-transparent px-5 py-2.5 text-center text-base font-medium shadow-sm transition-colors hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:pointer-events-none disabled:opacity-70"
+              className="flex h-10 items-center justify-center rounded-md border border-gray-400 bg-transparent px-4 py-2 text-center text-base font-medium shadow-sm transition-colors hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:pointer-events-none disabled:opacity-70"
             >
-              Generate expression
+              Generate cron
             </Link>
           </div>
         </div>
