@@ -1,4 +1,3 @@
-import type { NextApiRequest } from "next";
 import type { NextRequest } from "next/server";
 
 export type OpenAIStreamPayload = {
@@ -27,8 +26,14 @@ export type ChatGPTMessage = {
   content: string;
 };
 
-export interface ExtendedNextRequest extends NextRequest {
+export interface ExplainRequest extends NextRequest {
   json: () => Promise<{
     expression: string;
+  }>;
+}
+
+export interface GenerateRequest extends NextRequest {
+  json: () => Promise<{
+    description: string;
   }>;
 }

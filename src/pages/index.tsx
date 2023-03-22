@@ -1,11 +1,16 @@
+import Explain from "@/components/Explain";
+import Generate from "@/components/Generate";
+import Tabs from "@/components/Tabs";
 import Head from "next/head";
-import Link from "next/link";
+import { useState } from "react";
 
 export default function Home() {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
   return (
     <>
       <Head>
-        <title>Cronify</title>
+        <title>Cronbase</title>
       </Head>
       <main className="w-full pt-32 pb-32">
         <div className="container flex max-w-6xl flex-col items-center justify-center gap-10">
@@ -14,26 +19,24 @@ export default function Home() {
               Explaining and generating cron expressions for you
             </h1>
             <p className="text-center text-base text-gray-400 sm:text-lg">
-              Cronify is a tool that helps you understand and generate cron
+              Cronbase is a tool that helps you understand and generate cron
               expressions. Click on a link below to get started
             </p>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-5 whitespace-nowrap">
-            <Link
-              aria-label="Navigate to explore page"
-              href="/explain"
-              className="flex h-10 items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-center text-base font-medium shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:pointer-events-none disabled:opacity-70"
-            >
-              Explain cron
-            </Link>
-            <Link
-              aria-label="Navigate to generate page"
-              href="/generate"
-              className="flex h-10 items-center justify-center rounded-md border border-gray-400 bg-transparent px-4 py-2 text-center text-base font-medium shadow-sm transition-colors hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:pointer-events-none disabled:opacity-70"
-            >
-              Generate cron
-            </Link>
-          </div>
+          <Tabs
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            tabs={[
+              {
+                name: "Explain cron",
+                content: <Explain />,
+              },
+              {
+                name: "Generate cron",
+                content: <Generate />,
+              },
+            ]}
+          />
         </div>
       </main>
     </>

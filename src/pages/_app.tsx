@@ -24,7 +24,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <>
       <Head>
-        <title>Cronify</title>
+        <title>Cronbase</title>
       </Head>
       {getLayout(<Component {...pageProps} />)}
       <ToastWrapper />

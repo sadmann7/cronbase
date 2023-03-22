@@ -39,7 +39,7 @@ const Header = () => {
           href="https://github.com/sadmann7/npm-picker"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 rounded-full bg-blue-600 px-2 py-2 text-base transition-colors hover:bg-blue-700 active:scale-95 xxs:px-4"
+          className="flex items-center gap-2 rounded-full bg-violet-600 px-2 py-2 text-base transition-colors hover:bg-violet-700 active:scale-95 xxs:px-4"
         >
           <Icons.gitHub className="h-5 w-5" aria-hidden="true" />
           <span className="sr-only text-xs text-gray-100 xxs:not-sr-only sm:text-sm">
