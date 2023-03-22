@@ -10,12 +10,12 @@ type MetaProps = {
 };
 
 const Meta = ({
-  siteName = "npm Package Picker",
-  title = "npm Package Picker",
-  description = "Find the best npm packages for your project",
-  image = "https://npmpicker.vercel.app/api/og?title=npm%20Package%20Picker&description=Find%20the%20best%20npm%20packages%20for%20your%20project",
-  keywords = "npm, package picker, React, Vue, Angular, Svelte, Next.js, Gatsby.js, Vite.js, Snowpack.js, Webpack.js, Parcel.js, Rollup.js, esbuild.js, Sapper.js, SvelteKit.js, Nest.js, Express.js, Fastify.js, Koa.js, Hapi.js, Adonis.js, LoopBack.js, NestJS.js",
-  url = "https://npmpicker.vercel.app/",
+  siteName = "Cronbase",
+  title = "Cronbase",
+  description = "Explaining and generating cron expressions for you",
+  image = "https://cronbase.vercel.app/api/og?title=Cronbase&description=Explaining%20and%20generating%20cron%20expressions%20for%20you",
+  keywords = "cron, cron expression, cron generator, cron explain, cronbase",
+  url = "https://cronbase.vercel.app/",
 }: MetaProps) => {
   return (
     <Head>

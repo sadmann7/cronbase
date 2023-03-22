@@ -32,7 +32,7 @@ const Header = () => {
           className="flex items-center gap-2 text-white transition-colors hover:text-gray-100"
         >
           <Icons.logo className="h-6 w-6" aria-hidden="true" />
-          <span className="text-xl font-medium">Cronify</span>
+          <span className="text-xl font-medium">Cronbase</span>
         </Link>
         <a
           aria-label="navigate to github repo"
