@@ -1,9 +1,6 @@
 const Footer = () => {
   return (
-    <footer
-      aria-label="footer"
-      className="w-full bg-gradient-to-t from-gray-700 to-gray-800 py-5"
-    >
+    <footer aria-label="footer" className="w-full py-5">
       <div className="container grid max-w-6xl place-items-center text-center">
         <h1 className="text-sm text-gray-400 sm:text-base">
           Powered by{" "}

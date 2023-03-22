@@ -21,7 +21,7 @@ const Header = () => {
       className={twMerge(
         "fixed top-0 left-0 z-20 flex w-full items-center gap-4",
         isScrolled
-          ? "bg-gradient-to-t from-gray-700/80 to-gray-800/80 backdrop-blur-sm backdrop-filter"
+          ? "bg-gray-900/80 backdrop-blur-sm backdrop-filter"
           : "bg-transparent"
       )}
     >
@@ -39,7 +39,7 @@ const Header = () => {
           href="https://github.com/sadmann7/npm-picker"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 rounded-full bg-violet-600 px-2 py-2 text-base transition-colors hover:bg-violet-700 active:scale-95 xxs:px-4"
+          className="flex items-center gap-2 rounded-full bg-blue-600 px-2 py-2 text-base transition-colors hover:bg-blue-700 active:scale-95 xxs:px-4"
         >
           <Icons.gitHub className="h-5 w-5" aria-hidden="true" />
           <span className="sr-only text-xs text-gray-100 xxs:not-sr-only sm:text-sm">

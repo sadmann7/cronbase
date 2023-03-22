@@ -14,15 +14,15 @@ type TabsProps = {
 const Tabs = ({ selectedIndex, setSelectedIndex, tabs }: TabsProps) => {
   return (
     <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
-      <Tab.List className="mx-auto flex w-full max-w-xs space-x-2 rounded-md p-1">
+      <Tab.List className="mx-auto flex w-full max-w-[280px] space-x-1 rounded-md bg-gray-700 p-1">
         {tabs.map((tab) => (
           <Tab
             key={tab.name}
             className={twMerge(
-              "w-full rounded-md bg-gray-600 py-2.5 text-sm font-medium leading-5 text-gray-100",
-              "ring-white ring-opacity-60 ring-offset-2 ring-offset-gray-800 focus:outline-none focus:ring-1",
-              "ui-selected:bg-blue-600 ui-selected:shadow",
-              "ui-not-selected:text-blue-100 ui-not-selected:hover:bg-gray-600/80 ui-not-selected:hover:text-white"
+              "w-full rounded-sm py-2.5 px-2 text-sm font-medium leading-5 text-gray-100",
+              "ring-gray-400 ring-offset-1 ring-offset-gray-800 focus:outline-none focus:ring-1",
+              "ui-selected:bg-gray-900 ui-selected:shadow",
+              "ui-not-selected:text-blue-100 ui-not-selected:hover:bg-white/[0.12] ui-not-selected:hover:text-white"
             )}
           >
             {tab.name}

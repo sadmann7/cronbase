@@ -88,7 +88,7 @@ const Explain = () => {
         <input
           type="text"
           id="expression"
-          className="w-full rounded-md border-gray-400 bg-transparent px-4 pt-2.5 text-base text-gray-50 transition-colors placeholder:text-gray-400 focus:border-transparent focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full rounded-md border-gray-400 bg-transparent px-4 py-2.5 text-base text-gray-50 transition-colors placeholder:text-gray-400 focus:border-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-300 focus:ring-offset-2 focus:ring-offset-gray-800"
           placeholder="0 5 * * *"
           {...register("expression")}
           onKeyDown={(e) => {

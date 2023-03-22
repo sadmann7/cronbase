@@ -27,7 +27,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         className={twMerge(
           "flex w-full items-center justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-70 dark:focus:ring-gray-400 dark:focus:ring-offset-gray-800",
-          variant === "primary" && "bg-blue-600 text-white hover:bg-blue-700",
+          variant === "primary" &&
+            "bg-violet-600 text-white hover:bg-violet-700",
           variant === "secondary" &&
             "bg-gray-50 text-gray-900 hover:bg-gray-200",
           variant === "ghost" &&
@@ -42,9 +43,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
             <div className="flex space-x-2">
-              <div className="h-2 w-2 animate-bounce rounded-full bg-blue-600"></div>
-              <div className="h-2 w-2 animate-bounce rounded-full bg-blue-600"></div>
-              <div className="h-2 w-2 animate-bounce rounded-full bg-blue-600"></div>
+              <div className="h-2 w-2 animate-bounce rounded-full bg-violet-600"></div>
+              <div className="h-2 w-2 animate-bounce rounded-full bg-violet-600"></div>
+              <div className="h-2 w-2 animate-bounce rounded-full bg-violet-600"></div>
             </div>
           )
         ) : null}
