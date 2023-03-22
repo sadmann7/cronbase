@@ -1,3 +1,4 @@
+import { AppProvider } from "@/components/context/AppProvider";
 import DefaultLayout from "@/components/layouts/DefaultLayout";
 import ToastWrapper from "@/components/ui/ToastWrapper";
 import "@/styles/globals.css";
@@ -22,12 +23,12 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     Component.getLayout ?? ((page) => <DefaultLayout>{page}</DefaultLayout>);
 
   return (
-    <>
+    <AppProvider>
       <Head>
         <title>Cronbase</title>
       </Head>
       {getLayout(<Component {...pageProps} />)}
       <ToastWrapper />
-    </>
+    </AppProvider>
   );
 }

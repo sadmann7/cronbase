@@ -1,3 +1,4 @@
+import { useAppContext } from "@/components/context/AppProvider";
 import { Icons } from "@/components/Icons";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -5,6 +6,7 @@ import { twMerge } from "tailwind-merge";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
+  const { setGeneratedData } = useAppContext();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,6 +31,7 @@ const Header = () => {
         <Link
           aria-label="navigate to home page"
           href="/"
+          onClick={() => setGeneratedData("")}
           className="flex items-center gap-2 text-white transition-colors hover:text-gray-100"
         >
           <Icons.logo className="h-6 w-6" aria-hidden="true" />

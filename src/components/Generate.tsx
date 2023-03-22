@@ -1,6 +1,6 @@
+import { useAppContext } from "@/components/context/AppProvider";
 import Button from "@/components/ui/Button";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 
@@ -10,17 +10,16 @@ const schema = z.object({
 type Inputs = z.infer<typeof schema>;
 
 const Generate = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isDone, setIsDone] = useState<boolean>(false);
-  const [generations, setGenerations] = useState<string>("");
+  const { isLoading, setIsLoading, generatedData, setGeneratedData } =
+    useAppContext();
 
   // react-hook-form
-  const { register, handleSubmit, formState, control, reset } = useForm<Inputs>(
-    { resolver: zodResolver(schema) }
-  );
+  const { register, handleSubmit, formState, reset } = useForm<Inputs>({
+    resolver: zodResolver(schema),
+  });
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     console.log(data);
-    setGenerations("");
+    setGeneratedData("");
     setIsLoading(true);
     const response = await fetch("/api/generate", {
       method: "POST",
@@ -45,21 +44,19 @@ const Generate = () => {
     const reader = responseData.getReader();
     const decoder = new TextDecoder();
     let done = false;
-    setIsDone(done);
 
     while (!done) {
       const { value, done: doneReading } = await reader.read();
       done = doneReading;
       const chunkValue = decoder.decode(value);
-      setGenerations((prev) => prev + chunkValue);
-      setIsDone(done);
+      setGeneratedData((prev) => prev + chunkValue);
     }
 
     reset();
     setIsLoading(false);
   };
 
-  console.log(generations);
+  console.log(generatedData);
 
   return (
     <form
