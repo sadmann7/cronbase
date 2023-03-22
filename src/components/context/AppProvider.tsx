@@ -8,31 +8,31 @@ import {
 } from "react";
 
 type AppContextType = {
-  isLoading: boolean;
-  setIsLoading: Dispatch<SetStateAction<boolean>>;
   generatedData: string;
   setGeneratedData: Dispatch<SetStateAction<string>>;
+  explainedData: string;
+  setExplainedData: Dispatch<SetStateAction<string>>;
 };
 
 const AppContext = createContext<AppContextType>({
-  isLoading: false,
-  setIsLoading: () => {},
   generatedData: "",
   setGeneratedData: () => {},
+  explainedData: "",
+  setExplainedData: () => {},
 });
 const useAppContext = () => useContext(AppContext);
 
 const AppProvider = ({ children }: { children: ReactNode }) => {
-  const [isLoading, setIsLoading] = useState(false);
   const [generatedData, setGeneratedData] = useState("");
+  const [explainedData, setExplainedData] = useState("");
 
   return (
     <AppContext.Provider
       value={{
-        isLoading,
-        setIsLoading,
         generatedData,
         setGeneratedData,
+        explainedData,
+        setExplainedData,
       }}
     >
       {children}

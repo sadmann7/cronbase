@@ -6,7 +6,7 @@ import { twMerge } from "tailwind-merge";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
-  const { setGeneratedData } = useAppContext();
+  const { setGeneratedData, setExplainedData } = useAppContext();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,7 +23,7 @@ const Header = () => {
       className={twMerge(
         "fixed top-0 left-0 z-20 flex w-full items-center gap-4",
         isScrolled
-          ? "bg-gray-900/80 backdrop-blur-sm backdrop-filter"
+          ? "bg-gray-900/20 backdrop-blur-sm backdrop-filter"
           : "bg-transparent"
       )}
     >
@@ -31,7 +31,10 @@ const Header = () => {
         <Link
           aria-label="navigate to home page"
           href="/"
-          onClick={() => setGeneratedData("")}
+          onClick={() => {
+            setGeneratedData("");
+            setExplainedData("");
+          }}
           className="flex items-center gap-2 text-white transition-colors hover:text-gray-100"
         >
           <Icons.logo className="h-6 w-6" aria-hidden="true" />
@@ -42,7 +45,7 @@ const Header = () => {
           href="https://github.com/sadmann7/npm-picker"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 rounded-full bg-blue-600 px-2 py-2 text-base transition-colors hover:bg-blue-700 active:scale-95 xxs:px-4"
+          className="flex items-center gap-2 rounded-full bg-violet-600 px-2 py-2 text-base transition-colors hover:bg-violet-700 active:scale-95 xxs:px-4"
         >
           <Icons.gitHub className="h-5 w-5" aria-hidden="true" />
           <span className="sr-only text-xs text-gray-100 xxs:not-sr-only sm:text-sm">

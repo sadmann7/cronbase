@@ -1,6 +1,7 @@
 import { useAppContext } from "@/components/context/AppProvider";
 import Button from "@/components/ui/Button";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 
@@ -10,8 +11,8 @@ const schema = z.object({
 type Inputs = z.infer<typeof schema>;
 
 const Generate = () => {
-  const { isLoading, setIsLoading, generatedData, setGeneratedData } =
-    useAppContext();
+  const [isLoading, setIsLoading] = useState(false);
+  const { generatedData, setGeneratedData } = useAppContext();
 
   // react-hook-form
   const { register, handleSubmit, formState, reset } = useForm<Inputs>({
@@ -52,7 +53,6 @@ const Generate = () => {
       setGeneratedData((prev) => prev + chunkValue);
     }
 
-    reset();
     setIsLoading(false);
   };
 
@@ -69,7 +69,7 @@ const Generate = () => {
           htmlFor="description"
           className="text-sm font-medium sm:text-base"
         >
-          Enter your cron description
+          Cron description
         </label>
         <input
           type="text"

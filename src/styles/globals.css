@@ -7,5 +7,5 @@ html {
 }
 
 body {
-  @apply bg-gradient-to-b from-gray-900 via-gray-800 to-gray-700 text-gray-50;
+  @apply bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-900 to-gray-800 text-gray-50;
 }

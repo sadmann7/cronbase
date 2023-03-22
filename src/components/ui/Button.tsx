@@ -1,3 +1,4 @@
+import LoadingDots from "@/components/ui/LoadingDots";
 import { Loader2 } from "lucide-react";
 import type { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
 import { forwardRef } from "react";
@@ -26,7 +27,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         className={twMerge(
-          "flex w-full items-center justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-70 dark:focus:ring-gray-400 dark:focus:ring-offset-gray-800",
+          "flex h-10 w-full items-center justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-70 dark:focus:ring-gray-400 dark:focus:ring-offset-gray-800",
           variant === "primary" &&
             "bg-violet-600 text-white hover:bg-violet-700",
           variant === "secondary" &&
@@ -40,20 +41,19 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {isLoading ? (
           loadingVariant === "spinner" ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <div className="flex space-x-2">
-              <div className="h-2 w-2 animate-bounce rounded-full bg-violet-600"></div>
-              <div className="h-2 w-2 animate-bounce rounded-full bg-violet-600"></div>
-              <div className="h-2 w-2 animate-bounce rounded-full bg-violet-600"></div>
+            <div className="flex items-center">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <span>Loading...</span>
             </div>
+          ) : (
+            <LoadingDots
+              color={variant === "primary" ? "#f9fafb" : "#111827"}
+              size="large"
+            />
           )
-        ) : null}
-        {isLoading
-          ? loadingVariant === "spinner"
-            ? "Loading..."
-            : null
-          : props.children}
+        ) : (
+          props.children
+        )}
       </button>
     );
   }
