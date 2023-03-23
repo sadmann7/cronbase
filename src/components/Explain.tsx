@@ -18,17 +18,11 @@ type Inputs = z.infer<typeof schema>;
 const Explain = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { explainedData, setExplainedData } = useAppContext();
-  const [explainations, setExplainations] = useState([
-    {
-      name: "",
-      description: "",
-    },
-  ]);
 
   // react-hook-form
-  const { register, handleSubmit, formState, control, reset } = useForm<Inputs>(
-    { resolver: zodResolver(schema) }
-  );
+  const { register, handleSubmit, formState, watch, reset } = useForm<Inputs>({
+    resolver: zodResolver(schema),
+  });
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     console.log(data);
     setExplainedData("");
@@ -64,7 +58,6 @@ const Explain = () => {
       setExplainedData((prev) => prev + chunkValue);
     }
 
-    reset();
     setIsLoading(false);
   };
 
@@ -116,29 +109,69 @@ const Explain = () => {
         </Button>
       </form>
       {explainedData ? (
-        <div className="mt-10 grid gap-4 text-sm font-medium sm:text-base">
-          {explainedData
+        <ExplanationCard
+          expression={watch("expression")}
+          data={explainedData
             .split("\n")
             .map((item) => {
-              const [value, description] = item
-                .split(": ")
+              const [character, functionality, description] = item
+                .split(" | ")
                 .map((item) => item.trim());
               return {
-                value,
+                character,
+                functionality,
                 description,
               };
             })
-            .filter((item) => item.value && item.description)
-            .map((item) => (
-              <Fragment key={crypto.randomUUID()}>
-                <span className="font-medium">{item.value}</span>
-                <span>{item.description}</span>
-              </Fragment>
-            ))}
-        </div>
+            .filter(
+              (item) => item.character && item.functionality && item.description
+            )}
+        />
       ) : null}
     </Fragment>
   );
 };
 
 export default Explain;
+
+type ExplanationCardProps = {
+  expression: string;
+  data: {
+    character: string;
+    functionality: string;
+    description: string;
+  }[];
+};
+
+const ExplanationCard = ({ expression, data }: ExplanationCardProps) => {
+  console.log(expression);
+
+  return (
+    <div className="mt-8 grid w-full place-items-center gap-4 rounded-lg bg-gray-800 p-4">
+      <h2 className="bg-gradient-to-br from-violet-500 to-purple-500 bg-clip-text text-2xl font-bold text-transparent">
+        {expression}
+      </h2>
+      <div className="w-full space-y-2">
+        {data.map((item) => (
+          <div
+            key={crypto.randomUUID()}
+            className="flex items-center gap-4 rounded-lg bg-gray-700/80 p-4 shadow-md"
+          >
+            <div className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-purple-500 text-lg font-bold text-white">
+              {item.character.charAt(0).toUpperCase()}
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold text-white sm:text-base">
+                {item.functionality.charAt(0).toUpperCase() +
+                  item.functionality.slice(1)}
+              </span>
+              <span className="text-sm text-gray-400 sm:text-base">
+                {item.description}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};

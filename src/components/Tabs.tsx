@@ -33,7 +33,10 @@ const Tabs = ({ selectedIndex, setSelectedIndex, tabs }: TabsProps) => {
         {tabs.map((tab) => (
           <Tab.Panel
             key={tab.name}
-            className={twMerge("rounded-md p-1 focus:outline-none")}
+            className={twMerge(
+              "w-full rounded-md p-1",
+              "ring-gray-900/5 ring-offset-1 ring-offset-gray-900/5 focus:outline-none focus:ring-1"
+            )}
           >
             {tab.content}
           </Tab.Panel>
