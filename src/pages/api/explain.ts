@@ -30,7 +30,7 @@ export default async function handler(req: ExplainRequest) {
       {
         role: "system",
         content:
-          "You are a cron expression explainer. I will give you a cron expression and you will explain it to me. You will just explain each part of the expression. Make sure to only explain the expression, not the meaning of the expression. For example, if I give you the expression 0 0 0 0 0, you will say: 'At 0 minutes past 0 hours on 0 day of the month, every month'.",
+          "You are a cron expression explainer. I will give you a cron expression and you will explain it to me. You will just explain each part of the expression. Make sure to only explain the expression, not the meaning of the expression. Make sure to explain each charachter. For example, if I give you the expression 0 0 0 0 0, you will say: '0: minute, 0: hour, 0: day of month, 0: month, 0: day of week'. Make sure to use the format in the example.",
       },
       { role: "user", content: prompt },
     ],

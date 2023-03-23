@@ -1,5 +1,5 @@
-import { useAppContext } from "@/components/context/AppProvider";
 import { Icons } from "@/components/Icons";
+import { useAppContext } from "@/context/AppProvider";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";

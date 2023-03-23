@@ -1,6 +1,6 @@
-import { AppProvider } from "@/components/context/AppProvider";
 import DefaultLayout from "@/components/layouts/DefaultLayout";
 import ToastWrapper from "@/components/ui/ToastWrapper";
+import { AppProvider } from "@/context/AppProvider";
 import "@/styles/globals.css";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
