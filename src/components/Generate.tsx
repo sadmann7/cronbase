@@ -1,8 +1,11 @@
 import Button from "@/components/ui/Button";
+import Toggle from "@/components/ui/Toggle";
 import { useAppContext } from "@/context/AppProvider";
+import type { Generation } from "@/types/globals";
 import { zodResolver } from "@hookform/resolvers/zod";
+import dayjs from "dayjs";
 import { Copy } from "lucide-react";
-import { Fragment, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { z } from "zod";
@@ -14,11 +17,14 @@ type Inputs = z.infer<typeof schema>;
 
 const Generate = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isDone, setIsDone] = useState(false);
   const { generatedData, setGeneratedData } = useAppContext();
   const [isCopied, setIsCopied] = useState(false);
+  const [generations, setGenerations] = useState<Generation[]>([]);
+  const [isHistoryEnabled, setIsHistoryEnabled] = useState(false);
 
   // react-hook-form
-  const { register, handleSubmit, formState, reset } = useForm<Inputs>({
+  const { register, handleSubmit, formState, watch, reset } = useForm<Inputs>({
     resolver: zodResolver(schema),
   });
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
@@ -41,19 +47,19 @@ const Generate = () => {
 
     // This data is a ReadableStream
     const responseData = response.body;
-    if (!responseData) {
-      return;
-    }
+    if (!responseData) return;
 
     const reader = responseData.getReader();
     const decoder = new TextDecoder();
     let done = false;
+    setIsDone(done);
 
     while (!done) {
       const { value, done: doneReading } = await reader.read();
       done = doneReading;
       const chunkValue = decoder.decode(value);
       setGeneratedData((prev) => prev + chunkValue);
+      setIsDone(done);
     }
 
     setIsLoading(false);
@@ -61,8 +67,21 @@ const Generate = () => {
 
   console.log(generatedData);
 
+  // history of generations
+  useEffect(() => {
+    if (!isDone || !watch("description") || !generatedData) return;
+    setGenerations((prev) => [
+      ...prev,
+      {
+        description: watch("description"),
+        expression: generatedData,
+        createdAt: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+      },
+    ]);
+  }, [generatedData, isDone, watch]);
+
   return (
-    <Fragment>
+    <div className="grid place-items-center gap-5">
       <form
         aria-label="Generate cron expression"
         className="grid w-full max-w-xl gap-7"
@@ -105,13 +124,13 @@ const Generate = () => {
         </Button>
       </form>
       {generatedData ? (
-        <div className="mt-10 grid w-full place-items-center gap-2">
+        <div className="mt-5 grid w-full place-items-center gap-5">
           <h2 className="text-2xl font-medium">Generated cron</h2>
-          <div className="flex w-full items-center justify-between gap-2 rounded-md bg-gray-700 px-5 py-2.5">
-            <p className="text-lg font-medium">{generatedData}</p>
+          <div className="flex w-full items-center justify-between gap-2 rounded-lg bg-gray-600 px-5 py-2.5">
+            <p className="text-lg font-medium text-gray-50">{generatedData}</p>
             <button
               aria-label="Copy to clipboard"
-              className="rounded-md bg-gray-800 p-2 transition-colors hover:bg-gray-900 disabled:pointer-events-auto disabled:opacity-70"
+              className="rounded-md bg-gray-800/80 p-2 transition-colors hover:bg-gray-800 disabled:pointer-events-none disabled:opacity-70"
               onClick={() => {
                 navigator.clipboard.writeText(generatedData);
                 setIsCopied(true);
@@ -120,7 +139,7 @@ const Generate = () => {
                 });
                 setTimeout(() => {
                   setIsCopied(false);
-                }, 2000);
+                }, 3000);
               }}
               disabled={isCopied}
             >
@@ -129,7 +148,51 @@ const Generate = () => {
           </div>
         </div>
       ) : null}
-    </Fragment>
+      <Toggle
+        enabled={isHistoryEnabled}
+        setEnabled={setIsHistoryEnabled}
+        enabledLabel="Show history"
+        disabledLabel="Hide history"
+      />
+      {isHistoryEnabled ? (
+        <div className="grid w-full gap-2">
+          {generations
+            .sort((a, b) => dayjs(b.createdAt).diff(dayjs(a.createdAt)))
+            .map((generation, i) => (
+              <div
+                key={i}
+                className="flex w-full items-center justify-between gap-2 rounded-lg bg-gray-600 px-5 py-2.5"
+              >
+                <div className="flex flex-col gap-1">
+                  <p className="text-lg font-medium text-gray-50">
+                    {generation.expression}
+                  </p>
+                  <p className="text-sm font-medium text-gray-400">
+                    {generation.description}
+                  </p>
+                </div>
+                <button
+                  aria-label="Copy to clipboard"
+                  className="rounded-md bg-gray-800/80 p-2 transition-colors hover:bg-gray-800 disabled:pointer-events-none disabled:opacity-70"
+                  onClick={() => {
+                    navigator.clipboard.writeText(generation.expression);
+                    setIsCopied(true);
+                    toast.success("Copied to clipboard", {
+                      icon: "✂️",
+                    });
+                    setTimeout(() => {
+                      setIsCopied(false);
+                    }, 3000);
+                  }}
+                  disabled={isCopied}
+                >
+                  <Copy className="h-4 w-4 text-gray-50" aria-hidden="true" />
+                </button>
+              </div>
+            ))}
+        </div>
+      ) : null}
+    </div>
   );
 };
 

@@ -46,9 +46,7 @@ const Explain = () => {
 
     // This data is a ReadableStream
     const responseData = response.body;
-    if (!responseData) {
-      return;
-    }
+    if (!responseData) return;
 
     const reader = responseData.getReader();
     const decoder = new TextDecoder();

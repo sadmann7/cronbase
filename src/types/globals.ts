@@ -38,3 +38,9 @@ export interface GenerateRequest extends NextRequest {
     description: string;
   }>;
 }
+
+export type Generation = {
+  description: string;
+  expression: string;
+  createdAt: string;
+};
