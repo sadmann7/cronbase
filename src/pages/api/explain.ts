@@ -1,4 +1,4 @@
-import { type ExplainRequest, type OpenAIStreamPayload } from "@/types/globals";
+import type { ExplainRequest, OpenAIStreamPayload } from "@/types/globals";
 import { openaiStream } from "@/utils/openai";
 
 if (!process.env.OPENAI_API_KEY) {
@@ -12,10 +12,11 @@ export const config = {
 };
 
 export default async function handler(req: ExplainRequest) {
-  const { expression } = await req.json();
+  const { expression, detailed } = await req.json();
 
   console.log({
     expression,
+    detailed,
   });
 
   const prompt = `Explain the following cron expression: ${expression}`;
@@ -24,13 +25,17 @@ export default async function handler(req: ExplainRequest) {
     return new Response("No prompt in the request", { status: 400 });
   }
 
+  const shortContent =
+    "You are a cron expression explainer. I will give you a cron expression and you will explain it to me. You will just explain each part of the expression. Make sure to only explain the expression, not the meaning of the expression. For example, if I give you the expression 0 0 0 0 0, you will say: 'At 0 minutes past 0 hours on 0 day of the month, every month'.";
+  const longContent =
+    "You are a cron expression explainer. I will give you a cron expression and you will explain it to me. You will just explain each part of the expression. Make sure to only explain the expression, not the meaning of the expression. Make sure to explain each charachter. For example, if I give you the expression 0 0 0 0 0, you will say: '0 | minute (0 - 59) | what does this mean?', '0 | hour (0 - 23) | what does this mean?', '0 | day of month (1 - 31) | what does this mean?', '0 | month (1 - 12) | what does this mean?', '0 | day of week (0 - 6) | what does this mean?'. Make sure to follow the format of the example.";
+
   const payload: OpenAIStreamPayload = {
     model: "gpt-3.5-turbo",
     messages: [
       {
         role: "system",
-        content:
-          "You are a cron expression explainer. I will give you a cron expression and you will explain it to me. You will just explain each part of the expression. Make sure to only explain the expression, not the meaning of the expression. Make sure to explain each charachter. For example, if I give you the expression 0 0 0 0 0, you will say: '0 | minute (0 - 59) | what does this mean?', '0 | hour (0 - 23) | what does this mean?', '0 | day of month (1 - 31) | what does this mean?', '0 | month (1 - 12) | what does this mean?', '0 | day of week (0 - 6) | what does this mean?'. Make sure to follow the format of the example.",
+        content: detailed ? longContent : shortContent,
       },
       { role: "user", content: prompt },
     ],

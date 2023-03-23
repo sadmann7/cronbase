@@ -1,8 +1,6 @@
 import {
   Check,
-  ChevronDown,
   Clock10,
-  Copy,
   LucideProps,
   RefreshCcw,
   type Icon as LucideIcon,
@@ -12,8 +10,6 @@ export type Icon = LucideIcon;
 
 export const Icons = {
   check: Check,
-  chevronDown: ChevronDown,
-  copy: Copy,
   refresh: RefreshCcw,
   logo: (props: LucideProps) => <Clock10 {...props} />,
   gitHub: (props: LucideProps) => (

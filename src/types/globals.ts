@@ -29,6 +29,7 @@ export type ChatGPTMessage = {
 export interface ExplainRequest extends NextRequest {
   json: () => Promise<{
     expression: string;
+    detailed: boolean;
   }>;
 }
 

@@ -1,7 +1,4 @@
-import {
-  type GenerateRequest,
-  type OpenAIStreamPayload,
-} from "@/types/globals";
+import type { GenerateRequest, OpenAIStreamPayload } from "@/types/globals";
 import { openaiStream } from "@/utils/openai";
 
 if (!process.env.OPENAI_API_KEY) {
@@ -33,7 +30,7 @@ export default async function handler(req: GenerateRequest) {
       {
         role: "system",
         content:
-          "You are a cron expression generator. I will give you a description of a cron expression and you will generate it for me. You will just generate each part of the expression. For example, if I give you the description: 'At 0 minutes past 0 hours on 0 day of the month, every month', you will say: '0 0 0 0 0'.",
+          "You are a cron expression generator. I will give you a description of a cron expression and you will generate it for me. You will just generate each part of the expression. For example, if I give you the description: 'At 0 minutes past 0 hours on 0 day of the month, every month', you will say: '0 0 0 0 0'. Make sure not to include any extra characters.",
       },
       { role: "user", content: prompt },
     ],

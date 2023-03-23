@@ -1,4 +1,5 @@
 import Button from "@/components/ui/Button";
+import ToggleInput from "@/components/ui/ToggleInput";
 import { useAppContext } from "@/context/AppProvider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Fragment, useState } from "react";
@@ -12,6 +13,7 @@ const schema = z.object({
       /^((\*|(\d+|\d+\/\d+|\d+-\d+|\d+-\d+\/\d+|\d+,\d+|\d+,\d+\/\d+|\d+-\d+,\d+|\d+-\d+,\d+\/\d+|\d+L|\d+L\/\d+|\d+W|\d+W\/\d+|\d+#\d+|\d+#\d+\/\d+|\d+-\d+L|\d+-\d+L\/\d+|\d+-\d+W|\d+-\d+W\/\d+|\d+-\d+#\d+|\d+-\d+#\d+\/\d+|\d+L-\d+|\d+L-\d+\/\d+|\d+W-\d+|\d+W-\d+\/\d+|\d+#\d+-\d+|\d+#\d+-\d+\/\d+))\s){4}(\*|(\d+|\d+\/\d+|\d+-\d+|\d+-\d+\/\d+|\d+,\d+|\d+,\d+\/\d+|\d+-\d+,\d+|\d+-\d+,\d+\/\d+|\d+L|\d+L\/\d+|\d+W|\d+W\/\d+|\d+#\d+|\d+#\d+\/\d+|\d+-\d+L|\d+-\d+L\/\d+|\d+-\d+W|\d+-\d+W\/\d+|\d+-\d+#\d+|\d+-\d+#\d+\/\d+|\d+L-\d+|\d+L-\d+\/\d+|\d+W-\d+|\d+W-\d+\/\d+|\d+#\d+-\d+|\d+#\d+-\d+\/\d+))$/,
       "Invalid cron expression"
     ),
+  detailed: z.boolean().default(false),
 });
 type Inputs = z.infer<typeof schema>;
 
@@ -20,9 +22,10 @@ const Explain = () => {
   const { explainedData, setExplainedData } = useAppContext();
 
   // react-hook-form
-  const { register, handleSubmit, formState, watch, reset } = useForm<Inputs>({
-    resolver: zodResolver(schema),
-  });
+  const { register, handleSubmit, formState, watch, control, reset } =
+    useForm<Inputs>({
+      resolver: zodResolver(schema),
+    });
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     console.log(data);
     setExplainedData("");
@@ -98,6 +101,21 @@ const Explain = () => {
             </p>
           ) : null}
         </fieldset>
+        <fieldset className="grid gap-4">
+          <label htmlFor="detailed" className="sr-only">
+            Long explanation
+          </label>
+          <ToggleInput
+            control={control}
+            name="detailed"
+            label="Detailed explanation"
+          />
+          {formState.errors.detailed ? (
+            <p className="-mt-1.5 text-sm font-medium text-red-500">
+              {formState.errors.detailed.message}
+            </p>
+          ) : null}
+        </fieldset>
         <Button
           aria-label="Explain cron"
           className="w-full"
@@ -109,24 +127,34 @@ const Explain = () => {
         </Button>
       </form>
       {explainedData ? (
-        <ExplanationCard
-          expression={watch("expression")}
-          data={explainedData
-            .split("\n")
-            .map((item) => {
-              const [character, functionality, description] = item
-                .split(" | ")
-                .map((item) => item.trim());
-              return {
-                character,
-                functionality,
-                description,
-              };
-            })
-            .filter(
-              (item) => item.character && item.functionality && item.description
-            )}
-        />
+        watch("detailed") ? (
+          <ExplanationCard
+            expression={watch("expression")}
+            data={explainedData
+              .split("\n")
+              .map((item) => {
+                const [character, functionality, description] = item
+                  .split(" | ")
+                  .map((item) => item.trim());
+                return {
+                  character,
+                  functionality,
+                  description,
+                };
+              })
+              .filter(
+                (item) =>
+                  item.character && item.functionality && item.description
+              )}
+          />
+        ) : (
+          <div className="mt-8 grid w-full place-items-center gap-4 rounded-lg bg-gray-800 p-4">
+            <h2 className="bg-gradient-to-br from-violet-500 to-purple-500 bg-clip-text text-2xl font-bold text-transparent">
+              {watch("expression")}
+            </h2>
+            <div className="w-full space-y-2">{explainedData}</div>
+          </div>
+        )
       ) : null}
     </Fragment>
   );
