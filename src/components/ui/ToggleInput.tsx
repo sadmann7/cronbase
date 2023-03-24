@@ -9,6 +9,7 @@ type SwitchButtonProps<TFieldValues extends FieldValues> = {
   name: Path<TFieldValues>;
   defaultChecked?: boolean;
   label: string;
+  description?: string;
   srText?: string;
 };
 
@@ -17,6 +18,7 @@ const ToggleInput = <TFieldValues extends FieldValues>({
   name,
   defaultChecked = false,
   label,
+  description,
   srText = "Toggle",
 }: SwitchButtonProps<TFieldValues>) => {
   const [enabled, setEnabled] = useState(defaultChecked);
@@ -25,13 +27,24 @@ const ToggleInput = <TFieldValues extends FieldValues>({
     <Controller
       control={control}
       name={name}
-      //   defaultValue={defaultChecked as TFieldValues[typeof name]}
+      // defaultValue={defaultChecked as TFieldValues[typeof name]}
       render={({ field: { onChange } }) => (
         <Switch.Group>
           <div className="flex items-center justify-between gap-5">
-            <Switch.Label className="text-sm font-medium text-gray-300 sm:text-base">
-              {label}
-            </Switch.Label>
+            {description ? (
+              <div className="grid gap-1">
+                <Switch.Label className="text-sm font-medium text-gray-300 sm:text-base">
+                  {label}
+                </Switch.Label>
+                <Switch.Description className="text-sm text-gray-400">
+                  {description}
+                </Switch.Description>
+              </div>
+            ) : (
+              <Switch.Label className="text-sm font-medium text-gray-300 sm:text-base">
+                {label}
+              </Switch.Label>
+            )}
             <Switch
               checked={enabled}
               onChange={(val) => {

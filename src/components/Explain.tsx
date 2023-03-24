@@ -66,6 +66,10 @@ const Explain = () => {
       setExplainedData((prev) => prev + chunkValue);
     }
 
+    reset({
+      expression: "",
+      detailed: savedData.detailed,
+    });
     setIsLoading(false);
   };
 
@@ -132,6 +136,7 @@ const Explain = () => {
             control={control}
             name="detailed"
             label="Detailed explanation"
+            description="Show a long explanation of the cron expression"
             defaultChecked={true}
           />
           {formState.errors.detailed ? (
@@ -154,9 +159,9 @@ const Explain = () => {
         {explainedData ? (
           savedData.detailed ? (
             <div className="mt-8 grid w-full place-items-center gap-4 rounded-lg bg-gray-800 p-4">
-              <span className="w-full rounded-md bg-gradient-to-r from-violet-400 to-purple-500 px-2 py-3 text-center text-sm font-medium text-white sm:text-base">
+              <div className="w-full rounded-md bg-gradient-to-r from-violet-400 to-purple-500 px-4 py-3 text-center text-sm font-medium text-white sm:text-base">
                 {savedData.expression}
-              </span>
+              </div>
               <div className="w-full space-y-2">
                 {explainedData
                   .split("\n")
@@ -176,7 +181,7 @@ const Explain = () => {
                   .map((item) => (
                     <div
                       key={crypto.randomUUID()}
-                      className="grid gap-1 rounded-lg bg-gray-700 p-4 shadow-md"
+                      className="grid gap-1 rounded-lg bg-gray-700 px-5 py-3.5 shadow-md"
                     >
                       <div className="flex items-center gap-2 text-sm sm:text-base">
                         {item.character}{" "}
@@ -189,10 +194,12 @@ const Explain = () => {
             </div>
           ) : (
             <div className="mt-8 grid w-full place-items-center gap-4 rounded-lg bg-gray-800 p-4">
-              <span className="w-full rounded-md bg-gradient-to-r from-violet-400 to-purple-500 px-2 py-3 text-center text-sm font-medium text-white sm:text-base">
+              <div className="w-full rounded-md bg-gradient-to-r from-violet-400 to-purple-500 px-4 py-3 text-center text-sm font-medium text-white sm:text-base">
                 {savedData.expression}
-              </span>
-              <div className="w-full space-y-2">{explainedData}</div>
+              </div>
+              <div className="w-full rounded-lg bg-gray-700 px-5 py-3.5 shadow-md">
+                {explainedData}
+              </div>
             </div>
           )
         ) : null}
