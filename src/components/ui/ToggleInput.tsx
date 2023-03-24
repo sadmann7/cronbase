@@ -9,6 +9,7 @@ type SwitchButtonProps<TFieldValues extends FieldValues> = {
   name: Path<TFieldValues>;
   defaultChecked?: boolean;
   label: string;
+  srText?: string;
 };
 
 const ToggleInput = <TFieldValues extends FieldValues>({
@@ -16,6 +17,7 @@ const ToggleInput = <TFieldValues extends FieldValues>({
   name,
   defaultChecked = false,
   label,
+  srText = "Toggle",
 }: SwitchButtonProps<TFieldValues>) => {
   const [enabled, setEnabled] = useState(defaultChecked);
 
@@ -42,7 +44,7 @@ const ToggleInput = <TFieldValues extends FieldValues>({
                 enabled ? "bg-violet-700" : "bg-violet-500"
               )}
             >
-              <span className="sr-only">Use setting</span>
+              <span className="sr-only">{srText}</span>
               <span
                 aria-hidden="true"
                 className={twMerge(

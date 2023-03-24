@@ -1,7 +1,8 @@
 import Button from "@/components/ui/Button";
 import Toggle from "@/components/ui/Toggle";
 import { useAppContext } from "@/context/AppProvider";
-import type { Generation, SetState } from "@/types/globals";
+import useLocalStorage from "@/hooks/useLocalStorage";
+import type { Generation } from "@/types/globals";
 import { zodResolver } from "@hookform/resolvers/zod";
 import dayjs from "dayjs";
 import { AnimatePresence, motion } from "framer-motion";
@@ -22,8 +23,14 @@ const Generate = () => {
   const [isDone, setIsDone] = useState(false);
   const { generatedData, setGeneratedData } = useAppContext();
   const [isCopied, setIsCopied] = useState(false);
-  const [generations, setGenerations] = useState<Generation[]>([]);
-  const [isHistoryEnabled, setIsHistoryEnabled] = useState(false);
+  const [generations, setGenerations] = useLocalStorage<Generation[]>(
+    "generations",
+    []
+  );
+  const [isHistoryEnabled, setIsHistoryEnabled] = useLocalStorage<boolean>(
+    "isHistoryEnabled",
+    false
+  );
 
   // react-hook-form
   const { register, handleSubmit, formState, watch, reset } = useForm<Inputs>({
@@ -93,7 +100,7 @@ const Generate = () => {
         createdAt: dayjs().format("YYYY-MM-DD HH:mm:ss"),
       },
     ]);
-  }, [generatedData, isDone, watch]);
+  }, [generatedData, isDone, setGenerations, watch]);
 
   // download generations as csv
   const downloadCSV = () => {
@@ -166,7 +173,7 @@ const Generate = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <h2 className="text-2xl font-medium">Generated cron</h2>
+            <h2 className="text-2xl font-medium sm:text-3xl">Generated cron</h2>
             <Toggle
               enabled={isHistoryEnabled}
               setEnabled={setIsHistoryEnabled}
@@ -176,7 +183,7 @@ const Generate = () => {
             <AnimatePresence>
               {isHistoryEnabled ? (
                 <motion.div
-                  className="flex items-center gap-2 px-5"
+                  className="flex items-center gap-2"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.2 }}
@@ -209,7 +216,7 @@ const Generate = () => {
             <AnimatePresence>
               {generations.length > 0 ? (
                 <motion.div
-                  className="grid w-full gap-2"
+                  className="mt-1 grid w-full gap-2"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{
@@ -222,14 +229,60 @@ const Generate = () => {
                     .sort((a, b) => dayjs(b.createdAt).diff(dayjs(a.createdAt)))
                     .slice(0, isHistoryEnabled ? generations.length : 1)
                     .map((generation, i) => (
-                      <CronCard
+                      <div
                         key={i}
-                        cronIndex={i}
-                        generation={generation}
-                        isCopied={isCopied}
-                        setIsCopied={setIsCopied}
-                        setGenerations={setGenerations}
-                      />
+                        className="flex w-full items-center justify-between gap-2 rounded-lg bg-gray-700 px-5 py-2.5 shadow-md"
+                      >
+                        <div className="flex flex-col gap-1">
+                          <p className="text-base font-medium text-gray-50 sm:text-lg">
+                            {generation.expression}
+                          </p>
+                          <p className="text-xs font-medium text-gray-400 sm:text-sm">
+                            {generation.description}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            aria-label="Delete cron"
+                            className="rounded-md bg-gray-800 p-2 transition-colors hover:bg-gray-900/80 active:scale-95 disabled:pointer-events-none disabled:opacity-70"
+                            onClick={() => {
+                              setGenerations((prev) =>
+                                prev.filter((_, j) => i !== j)
+                              );
+                              toast.success("Cron deleted", {
+                                icon: "🗑️",
+                              });
+                            }}
+                          >
+                            <Trash
+                              className="h-4 w-4 text-gray-50"
+                              aria-hidden="true"
+                            />
+                          </button>
+                          <button
+                            aria-label="Copy cron to clipboard"
+                            className="rounded-md bg-gray-800 p-2 transition-colors hover:bg-gray-900/80 active:scale-95 disabled:pointer-events-none disabled:opacity-70"
+                            onClick={() => {
+                              navigator.clipboard.writeText(
+                                generation.expression
+                              );
+                              setIsCopied(true);
+                              toast.success("Cron copied to clipboard", {
+                                icon: "✂️",
+                              });
+                              setTimeout(() => {
+                                setIsCopied(false);
+                              }, 3000);
+                            }}
+                            disabled={isCopied}
+                          >
+                            <Copy
+                              className="h-4 w-4 text-gray-50"
+                              aria-hidden="true"
+                            />
+                          </button>
+                        </div>
+                      </div>
                     ))}
                 </motion.div>
               ) : null}
@@ -242,63 +295,3 @@ const Generate = () => {
 };
 
 export default Generate;
-
-type CronCardProps = {
-  cronIndex: number;
-  generation: Generation;
-  isCopied: boolean;
-  setIsCopied: SetState<boolean>;
-  setGenerations: SetState<Generation[]>;
-};
-
-const CronCard = ({
-  cronIndex,
-  generation,
-  isCopied,
-  setIsCopied,
-  setGenerations,
-}: CronCardProps) => {
-  return (
-    <div className="flex w-full items-center justify-between gap-2 rounded-lg bg-gray-600 px-5 py-2.5">
-      <div className="flex flex-col gap-1">
-        <p className="text-lg font-medium text-gray-50">
-          {generation.expression}
-        </p>
-        <p className="text-sm font-medium text-gray-400">
-          {generation.description}
-        </p>
-      </div>
-      <div className="flex items-center gap-2">
-        <button
-          aria-label="Delete cron"
-          className="rounded-md bg-gray-800/80 p-2 transition-colors hover:bg-gray-800 active:scale-95 disabled:pointer-events-none disabled:opacity-70"
-          onClick={() => {
-            setGenerations((prev) => prev.filter((_, i) => i !== cronIndex));
-            toast.success("Cron deleted", {
-              icon: "🗑️",
-            });
-          }}
-        >
-          <Trash className="h-4 w-4 text-gray-50" />
-        </button>
-        <button
-          aria-label="Copy cron expression to clipboard"
-          className="rounded-md bg-gray-800/80 p-2 transition-colors hover:bg-gray-800 active:scale-95 disabled:pointer-events-none disabled:opacity-70"
-          onClick={() => {
-            navigator.clipboard.writeText(generation.expression);
-            setIsCopied(true);
-            toast.success("Cron copied to clipboard", {
-              icon: "✂️",
-            });
-            setTimeout(() => {
-              setIsCopied(false);
-            }, 3000);
-          }}
-          disabled={isCopied}
-        >
-          <Copy className="h-4 w-4 text-gray-50" aria-hidden="true" />
-        </button>
-      </div>
-    </div>
-  );
-};

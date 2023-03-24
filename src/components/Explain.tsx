@@ -1,4 +1,4 @@
-import useLocalStorage from "@/components/hooks/useLocalStorage";
+import useLocalStorage from "@/hooks/useLocalStorage";
 import Button from "@/components/ui/Button";
 import ToggleInput from "@/components/ui/ToggleInput";
 import { useAppContext } from "@/context/AppProvider";
@@ -135,7 +135,7 @@ const Explain = () => {
       {explainedData ? (
         savedData.detailed ? (
           <div className="mt-8 grid w-full place-items-center gap-4 rounded-lg bg-gray-800 p-4">
-            <span className="w-full rounded-md bg-gradient-to-r from-violet-400 to-purple-500 px-2 py-3 text-center text-sm font-medium text-white">
+            <span className="w-full rounded-md bg-gradient-to-r from-violet-400 to-purple-500 px-2 py-3 text-center text-sm font-medium text-white sm:text-base">
               {savedData.expression}
             </span>
             <div className="w-full space-y-2">
@@ -155,9 +155,9 @@ const Explain = () => {
                 .map((item) => (
                   <div
                     key={crypto.randomUUID()}
-                    className="grid gap-1 rounded-lg bg-gray-700/80 p-4 shadow-md"
+                    className="grid gap-1 rounded-lg bg-gray-700 p-4 shadow-md"
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 text-sm sm:text-base">
                       {item.character}{" "}
                       <span className="text-gray-400">{item.range}</span>
                     </div>
@@ -168,7 +168,7 @@ const Explain = () => {
           </div>
         ) : (
           <div className="mt-8 grid w-full place-items-center gap-4 rounded-lg bg-gray-800 p-4">
-            <span className="w-full rounded-md bg-gradient-to-r from-violet-400 to-purple-500 px-2 py-3 text-center text-sm font-medium text-white">
+            <span className="w-full rounded-md bg-gradient-to-r from-violet-400 to-purple-500 px-2 py-3 text-center text-sm font-medium text-white sm:text-base">
               {savedData.expression}
             </span>
             <div className="w-full space-y-2">{explainedData}</div>
