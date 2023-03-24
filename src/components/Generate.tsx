@@ -1,6 +1,5 @@
 import Button from "@/components/ui/Button";
 import Toggle from "@/components/ui/Toggle";
-import { useAppContext } from "@/context/AppProvider";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import type { Generation } from "@/types/globals";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,7 +20,7 @@ type Inputs = z.infer<typeof schema>;
 const Generate = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isDone, setIsDone] = useState(false);
-  const { generatedData, setGeneratedData } = useAppContext();
+  const [generatedData, setGeneratedData] = useState("");
   const [isCopied, setIsCopied] = useState(false);
   const [generations, setGenerations] = useLocalStorage<Generation[]>(
     "generations",

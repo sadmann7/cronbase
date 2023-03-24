@@ -1,6 +1,5 @@
 import DefaultLayout from "@/components/layouts/DefaultLayout";
 import ToastWrapper from "@/components/ui/ToastWrapper";
-import { AppProvider } from "@/context/AppProvider";
 import "@/styles/globals.css";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
@@ -23,12 +22,12 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     Component.getLayout ?? ((page) => <DefaultLayout>{page}</DefaultLayout>);
 
   return (
-    <AppProvider>
+    <>
       <Head>
         <title>Cronbase</title>
       </Head>
       {getLayout(<Component {...pageProps} />)}
       <ToastWrapper />
-    </AppProvider>
+    </>
   );
 }

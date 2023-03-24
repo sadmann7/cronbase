@@ -1,6 +1,5 @@
 import Button from "@/components/ui/Button";
 import ToggleInput from "@/components/ui/ToggleInput";
-import { useAppContext } from "@/context/AppProvider";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Fragment, useEffect, useRef, useState } from "react";
@@ -20,7 +19,7 @@ type Inputs = z.infer<typeof schema>;
 
 const Explain = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { explainedData, setExplainedData } = useAppContext();
+  const [explainedData, setExplainedData] = useState("");
   const [savedData, setSavedData] = useLocalStorage<Inputs>("savedData", {
     expression: "",
     detailed: true,
@@ -70,12 +69,14 @@ const Explain = () => {
     setIsLoading(false);
   };
 
-  // scroll to generated data
+  // scroll to generated data, but only when it's being generated
   useEffect(() => {
     if (!generatedRef.current) return;
-    const offset = generatedRef.current.offsetTop - 100;
-    window.scrollTo({ top: offset, behavior: "smooth" });
-  }, [explainedData]);
+    if (isLoading) {
+      const offset = generatedRef.current.offsetTop - 100;
+      window.scrollTo({ top: offset, behavior: "smooth" });
+    }
+  }, [explainedData, isLoading]);
 
   // clear local storage
   useEffect(() => {
