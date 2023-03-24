@@ -20,6 +20,7 @@ type Inputs = z.infer<typeof schema>;
 const Explain = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { explainedData, setExplainedData } = useAppContext();
+  const [isDetailed, setIsDetailed] = useState(false);
 
   // react-hook-form
   const { register, handleSubmit, formState, watch, control, reset } =
@@ -30,6 +31,7 @@ const Explain = () => {
     console.log(data);
     setExplainedData("");
     setIsLoading(true);
+    setIsDetailed(data.detailed);
     const response = await fetch("/api/explain", {
       method: "POST",
       headers: {
@@ -125,31 +127,46 @@ const Explain = () => {
         </Button>
       </form>
       {explainedData ? (
-        watch("detailed") ? (
-          <ExplanationCard
-            expression={watch("expression")}
-            data={explainedData
-              .split("\n")
-              .map((item) => {
-                const [character, functionality, description] = item
-                  .split(" | ")
-                  .map((item) => item.trim());
-                return {
-                  character,
-                  functionality,
-                  description,
-                };
-              })
-              .filter(
-                (item) =>
-                  item.character && item.functionality && item.description
-              )}
-          />
+        isDetailed ? (
+          <div className="mt-8 grid w-full place-items-center gap-4 rounded-lg bg-gray-800 p-4">
+            <span className="w-full rounded-md bg-violet-600 px-2 py-3 text-center text-sm font-medium text-white">
+              {watch("expression")}
+            </span>
+            <div className="w-full space-y-2">
+              {explainedData
+                .split("\n")
+                .map((item) => {
+                  const [character, range, description] = item
+                    .split(" | ")
+                    .map((item) => item.trim());
+                  return {
+                    character,
+                    range,
+                    description,
+                  };
+                })
+                .filter(
+                  (item) => item.character && item.range && item.description
+                )
+                .map((item) => (
+                  <div
+                    key={crypto.randomUUID()}
+                    className="grid gap-1 rounded-lg bg-gray-700/80 p-4 shadow-md"
+                  >
+                    <div className="flex items-center gap-2">
+                      {item.character}{" "}
+                      <span className="text-gray-400">{item.range}</span>
+                    </div>
+                    <p className="text-gray-400">{item.description}</p>
+                  </div>
+                ))}
+            </div>
+          </div>
         ) : (
           <div className="mt-8 grid w-full place-items-center gap-4 rounded-lg bg-gray-800 p-4">
-            <h2 className="bg-gradient-to-br from-violet-500 to-purple-500 bg-clip-text text-2xl font-bold text-transparent">
+            <span className="w-full rounded-md bg-violet-600 px-2 py-3 text-center text-sm font-medium text-white">
               {watch("expression")}
-            </h2>
+            </span>
             <div className="w-full space-y-2">{explainedData}</div>
           </div>
         )
@@ -164,40 +181,7 @@ type ExplanationCardProps = {
   expression: string;
   data: {
     character: string;
-    functionality: string;
+    range: string;
     description: string;
   }[];
-};
-
-const ExplanationCard = ({ expression, data }: ExplanationCardProps) => {
-  console.log(expression);
-
-  return (
-    <div className="mt-8 grid w-full place-items-center gap-4 rounded-lg bg-gray-800 p-4">
-      <h2 className="bg-gradient-to-br from-violet-500 to-purple-500 bg-clip-text text-2xl font-bold text-transparent">
-        {expression}
-      </h2>
-      <div className="w-full space-y-2">
-        {data.map((item) => (
-          <div
-            key={crypto.randomUUID()}
-            className="flex items-center gap-4 rounded-lg bg-gray-700/80 p-4 shadow-md"
-          >
-            <div className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-purple-500 text-lg font-bold text-white">
-              {item.character.charAt(0).toUpperCase()}
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold text-white sm:text-base">
-                {item.functionality.charAt(0).toUpperCase() +
-                  item.functionality.slice(1)}
-              </span>
-              <span className="text-sm text-gray-400 sm:text-base">
-                {item.description}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 };

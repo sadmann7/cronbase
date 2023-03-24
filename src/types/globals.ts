@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import type { Dispatch, SetStateAction } from "react";
 
 export type OpenAIStreamPayload = {
   model: ChatGPTModel;
@@ -44,3 +45,5 @@ export type Generation = {
   expression: string;
   createdAt: string;
 };
+
+export type SetState<T> = Dispatch<SetStateAction<T>>;

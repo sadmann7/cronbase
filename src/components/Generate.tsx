@@ -1,7 +1,7 @@
 import Button from "@/components/ui/Button";
 import Toggle from "@/components/ui/Toggle";
 import { useAppContext } from "@/context/AppProvider";
-import type { Generation } from "@/types/globals";
+import type { Generation, SetState } from "@/types/globals";
 import { zodResolver } from "@hookform/resolvers/zod";
 import dayjs from "dayjs";
 import { Copy } from "lucide-react";
@@ -128,23 +128,11 @@ const Generate = () => {
           <h2 className="text-2xl font-medium">Generated cron</h2>
           <div className="flex w-full items-center justify-between gap-2 rounded-lg bg-gray-600 px-5 py-2.5">
             <p className="text-lg font-medium text-gray-50">{generatedData}</p>
-            <button
-              aria-label="Copy to clipboard"
-              className="rounded-md bg-gray-800/80 p-2 transition-colors hover:bg-gray-800 disabled:pointer-events-none disabled:opacity-70"
-              onClick={() => {
-                navigator.clipboard.writeText(generatedData);
-                setIsCopied(true);
-                toast.success("Copied to clipboard", {
-                  icon: "✂️",
-                });
-                setTimeout(() => {
-                  setIsCopied(false);
-                }, 3000);
-              }}
-              disabled={isCopied}
-            >
-              <Copy className="h-4 w-4 text-gray-50" aria-hidden="true" />
-            </button>
+            <CopyButton
+              data={generatedData}
+              isCopied={isCopied}
+              setIsCopied={setIsCopied}
+            />
           </div>
         </div>
       ) : null}
@@ -153,47 +141,66 @@ const Generate = () => {
         setEnabled={setIsHistoryEnabled}
         enabledLabel="Show history"
         disabledLabel="Hide history"
+        className="grid place-items-center"
       />
       {isHistoryEnabled ? (
-        <div className="grid w-full gap-2">
-          {generations
-            .sort((a, b) => dayjs(b.createdAt).diff(dayjs(a.createdAt)))
-            .map((generation, i) => (
-              <div
-                key={i}
-                className="flex w-full items-center justify-between gap-2 rounded-lg bg-gray-600 px-5 py-2.5"
-              >
-                <div className="flex flex-col gap-1">
-                  <p className="text-lg font-medium text-gray-50">
-                    {generation.expression}
-                  </p>
-                  <p className="text-sm font-medium text-gray-400">
-                    {generation.description}
-                  </p>
-                </div>
-                <button
-                  aria-label="Copy to clipboard"
-                  className="rounded-md bg-gray-800/80 p-2 transition-colors hover:bg-gray-800 disabled:pointer-events-none disabled:opacity-70"
-                  onClick={() => {
-                    navigator.clipboard.writeText(generation.expression);
-                    setIsCopied(true);
-                    toast.success("Copied to clipboard", {
-                      icon: "✂️",
-                    });
-                    setTimeout(() => {
-                      setIsCopied(false);
-                    }, 3000);
-                  }}
-                  disabled={isCopied}
+        generations.length > 0 ? (
+          <div className="grid w-full gap-2">
+            {generations
+              .sort((a, b) => dayjs(b.createdAt).diff(dayjs(a.createdAt)))
+              .map((generation, i) => (
+                <div
+                  key={i}
+                  className="flex w-full items-center justify-between gap-2 rounded-lg bg-gray-600 px-5 py-2.5"
                 >
-                  <Copy className="h-4 w-4 text-gray-50" aria-hidden="true" />
-                </button>
-              </div>
-            ))}
-        </div>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-lg font-medium text-gray-50">
+                      {generation.expression}
+                    </p>
+                    <p className="text-sm font-medium text-gray-400">
+                      {generation.description}
+                    </p>
+                  </div>
+                  <CopyButton
+                    data={generation.expression}
+                    isCopied={isCopied}
+                    setIsCopied={setIsCopied}
+                  />
+                </div>
+              ))}
+          </div>
+        ) : null
       ) : null}
     </div>
   );
 };
 
 export default Generate;
+
+type CopyButtonProps = {
+  data: string;
+  isCopied: boolean;
+  setIsCopied: SetState<boolean>;
+};
+
+const CopyButton = ({ data, isCopied, setIsCopied }: CopyButtonProps) => {
+  return (
+    <button
+      aria-label="Copy to clipboard"
+      className="rounded-md bg-gray-800/80 p-2 transition-colors hover:bg-gray-800 disabled:pointer-events-none disabled:opacity-70"
+      onClick={() => {
+        navigator.clipboard.writeText(data);
+        setIsCopied(true);
+        toast.success("Copied to clipboard", {
+          icon: "✂️",
+        });
+        setTimeout(() => {
+          setIsCopied(false);
+        }, 3000);
+      }}
+      disabled={isCopied}
+    >
+      <Copy className="h-4 w-4 text-gray-50" aria-hidden="true" />
+    </button>
+  );
+};
