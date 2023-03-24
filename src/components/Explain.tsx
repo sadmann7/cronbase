@@ -3,7 +3,7 @@ import ToggleInput from "@/components/ui/ToggleInput";
 import { useAppContext } from "@/context/AppProvider";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 
@@ -25,6 +25,7 @@ const Explain = () => {
     expression: "",
     detailed: true,
   });
+  const generatedRef = useRef<HTMLDivElement>(null);
 
   // react-hook-form
   const { register, handleSubmit, formState, control, reset } = useForm<Inputs>(
@@ -68,6 +69,13 @@ const Explain = () => {
 
     setIsLoading(false);
   };
+
+  // scroll to generated data
+  useEffect(() => {
+    if (!generatedRef.current) return;
+    const offset = generatedRef.current.offsetTop - 100;
+    window.scrollTo({ top: offset, behavior: "smooth" });
+  }, [explainedData]);
 
   // clear local storage
   useEffect(() => {
@@ -141,49 +149,53 @@ const Explain = () => {
           Explain cron
         </Button>
       </form>
-      {explainedData ? (
-        savedData.detailed ? (
-          <div className="mt-8 grid w-full place-items-center gap-4 rounded-lg bg-gray-800 p-4">
-            <span className="w-full rounded-md bg-gradient-to-r from-violet-400 to-purple-500 px-2 py-3 text-center text-sm font-medium text-white sm:text-base">
-              {savedData.expression}
-            </span>
-            <div className="w-full space-y-2">
-              {explainedData
-                .split("\n")
-                .map((item) => {
-                  const [character, range, meaning] = item
-                    .split(" | ")
-                    .map((item) => item.trim());
-                  return {
-                    character,
-                    range,
-                    meaning,
-                  };
-                })
-                .filter((item) => item.character && item.range && item.meaning)
-                .map((item) => (
-                  <div
-                    key={crypto.randomUUID()}
-                    className="grid gap-1 rounded-lg bg-gray-700 p-4 shadow-md"
-                  >
-                    <div className="flex items-center gap-2 text-sm sm:text-base">
-                      {item.character}{" "}
-                      <span className="text-gray-400">{item.range}</span>
+      <div ref={generatedRef}>
+        {explainedData ? (
+          savedData.detailed ? (
+            <div className="mt-8 grid w-full place-items-center gap-4 rounded-lg bg-gray-800 p-4">
+              <span className="w-full rounded-md bg-gradient-to-r from-violet-400 to-purple-500 px-2 py-3 text-center text-sm font-medium text-white sm:text-base">
+                {savedData.expression}
+              </span>
+              <div className="w-full space-y-2">
+                {explainedData
+                  .split("\n")
+                  .map((item) => {
+                    const [character, range, meaning] = item
+                      .split(" | ")
+                      .map((item) => item.trim());
+                    return {
+                      character,
+                      range,
+                      meaning,
+                    };
+                  })
+                  .filter(
+                    (item) => item.character && item.range && item.meaning
+                  )
+                  .map((item) => (
+                    <div
+                      key={crypto.randomUUID()}
+                      className="grid gap-1 rounded-lg bg-gray-700 p-4 shadow-md"
+                    >
+                      <div className="flex items-center gap-2 text-sm sm:text-base">
+                        {item.character}{" "}
+                        <span className="text-gray-400">{item.range}</span>
+                      </div>
+                      <p className="text-gray-400">{item.meaning}</p>
                     </div>
-                    <p className="text-gray-400">{item.meaning}</p>
-                  </div>
-                ))}
+                  ))}
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="mt-8 grid w-full place-items-center gap-4 rounded-lg bg-gray-800 p-4">
-            <span className="w-full rounded-md bg-gradient-to-r from-violet-400 to-purple-500 px-2 py-3 text-center text-sm font-medium text-white sm:text-base">
-              {savedData.expression}
-            </span>
-            <div className="w-full space-y-2">{explainedData}</div>
-          </div>
-        )
-      ) : null}
+          ) : (
+            <div className="mt-8 grid w-full place-items-center gap-4 rounded-lg bg-gray-800 p-4">
+              <span className="w-full rounded-md bg-gradient-to-r from-violet-400 to-purple-500 px-2 py-3 text-center text-sm font-medium text-white sm:text-base">
+                {savedData.expression}
+              </span>
+              <div className="w-full space-y-2">{explainedData}</div>
+            </div>
+          )
+        ) : null}
+      </div>
     </Fragment>
   );
 };
