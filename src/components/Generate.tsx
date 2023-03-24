@@ -4,10 +4,12 @@ import { useAppContext } from "@/context/AppProvider";
 import type { Generation, SetState } from "@/types/globals";
 import { zodResolver } from "@hookform/resolvers/zod";
 import dayjs from "dayjs";
-import { Copy } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Copy, Download, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "react-hot-toast";
+import { twMerge } from "tailwind-merge";
 import { z } from "zod";
 
 const schema = z.object({
@@ -80,6 +82,25 @@ const Generate = () => {
     ]);
   }, [generatedData, isDone, watch]);
 
+  // download generations as csv
+  const downloadCSV = () => {
+    if (generations.length === 0) return;
+    const csv = `Prompt,Expression,Created At\n${generations
+      .map((generation) => {
+        return `${generation.description},${generation.expression},${generation.createdAt}`;
+      })
+      .join("\n")}`;
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "cron-expressions.csv");
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="grid place-items-center gap-5">
       <form
@@ -141,11 +162,52 @@ const Generate = () => {
         setEnabled={setIsHistoryEnabled}
         enabledLabel="Show history"
         disabledLabel="Hide history"
-        className="grid place-items-center"
       />
-      {isHistoryEnabled ? (
-        generations.length > 0 ? (
-          <div className="grid w-full gap-2">
+      <AnimatePresence>
+        {isHistoryEnabled ? (
+          <motion.div
+            className="flex items-center gap-2 px-5"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <button
+              aria-label="Download csv"
+              className={twMerge(
+                "rounded-md bg-gray-700 p-2 transition-colors hover:bg-gray-700/80 active:scale-95 disabled:pointer-events-none disabled:opacity-70",
+                generations.length === 0 ? "hidden" : "block"
+              )}
+              onClick={downloadCSV}
+            >
+              <Download className="h-5 w-5" />
+            </button>
+            <button
+              aria-label="Delete"
+              className={twMerge(
+                "rounded-md bg-gray-700 p-2 transition-colors hover:bg-gray-700/80 active:scale-95 disabled:pointer-events-none disabled:opacity-70",
+                generations.length === 0 ? "hidden" : "block"
+              )}
+              onClick={() => {
+                setGenerations([]);
+              }}
+            >
+              <Trash className="h-5 w-5" />
+            </button>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isHistoryEnabled && generations.length > 0 ? (
+          <motion.div
+            className="grid w-full gap-2"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.2,
+              delayChildren: 0.2,
+              staggerChildren: 0.1,
+            }}
+          >
             {generations
               .sort((a, b) => dayjs(b.createdAt).diff(dayjs(a.createdAt)))
               .map((generation, i) => (
@@ -168,9 +230,9 @@ const Generate = () => {
                   />
                 </div>
               ))}
-          </div>
-        ) : null
-      ) : null}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 };
