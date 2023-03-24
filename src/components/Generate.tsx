@@ -6,7 +6,7 @@ import type { Generation } from "@/types/globals";
 import { zodResolver } from "@hookform/resolvers/zod";
 import dayjs from "dayjs";
 import { AnimatePresence, motion } from "framer-motion";
-import { Copy, Download, Trash } from "lucide-react";
+import { Copy, Download, RefreshCcw, Trash } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -31,6 +31,7 @@ const Generate = () => {
     "isHistoryEnabled",
     false
   );
+  const generatedRef = useRef<HTMLDivElement>(null);
 
   // react-hook-form
   const { register, handleSubmit, formState, watch, reset } = useForm<Inputs>({
@@ -71,36 +72,49 @@ const Generate = () => {
       setIsDone(done);
     }
 
-    scrollToGenerated(55);
     setIsLoading(false);
   };
 
   console.log(generatedData);
 
   // scroll to generated expression
-  const generatedRef = useRef<HTMLDivElement>(null);
-  const scrollToGenerated = (amount?: number) => {
+  useEffect(() => {
     if (!generatedRef.current) return;
-    if (typeof amount === "undefined") amount = 0;
-    const offset = generatedRef.current.offsetTop - amount;
+    const offset = generatedRef.current.offsetTop - 150;
     window.scrollTo({
       top: offset,
       behavior: "smooth",
     });
-  };
+  }, [generatedData]);
 
-  // history of generations
+  // save generation to history
+  const setGenerationsRef = useRef(setGenerations);
+
   useEffect(() => {
-    if (!isDone || !watch("description") || !generatedData) return;
-    setGenerations((prev) => [
-      ...prev,
-      {
+    if (!setGenerationsRef.current) return;
+    setGenerationsRef.current = setGenerations;
+  }, [setGenerations]);
+
+  useEffect(() => {
+    if (!isDone || !generatedData) return;
+    setGenerationsRef.current((prev) => {
+      const newGeneration: Generation = {
         description: watch("description"),
         expression: generatedData,
-        createdAt: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-      },
-    ]);
-  }, [generatedData, isDone, setGenerations, watch]);
+        createdAt: dayjs().format(),
+      };
+      return [...prev, newGeneration];
+    });
+  }, [generatedData, isDone, watch]);
+
+  // clear local storage
+  useEffect(() => {
+    window.addEventListener("beforeunload", () => localStorage.clear());
+
+    return () => {
+      window.removeEventListener("beforeunload", () => localStorage.clear());
+    };
+  }, []);
 
   // download generations as csv
   const downloadCSV = () => {
@@ -189,7 +203,7 @@ const Generate = () => {
                   transition={{ duration: 0.2 }}
                 >
                   <button
-                    aria-label="Download csv"
+                    aria-label="Download as CSV"
                     className={twMerge(
                       "rounded-md bg-gray-700 p-2 transition-colors hover:bg-gray-700/80 active:scale-95 disabled:pointer-events-none disabled:opacity-70",
                       generations.length === 0 ? "hidden" : "block"
@@ -199,93 +213,92 @@ const Generate = () => {
                     <Download className="h-5 w-5" />
                   </button>
                   <button
-                    aria-label="Delete"
+                    aria-label="Delete generations and reset form"
                     className={twMerge(
                       "rounded-md bg-gray-700 p-2 transition-colors hover:bg-gray-700/80 active:scale-95 disabled:pointer-events-none disabled:opacity-70",
                       generations.length === 0 ? "hidden" : "block"
                     )}
                     onClick={() => {
                       setGenerations([]);
+                      reset();
                     }}
                   >
-                    <Trash className="h-5 w-5" />
+                    <RefreshCcw className="h-5 w-5" aria-hidden="true" />
                   </button>
                 </motion.div>
               ) : null}
             </AnimatePresence>
             <AnimatePresence>
-              {generations.length > 0 ? (
-                <motion.div
-                  className="mt-1 grid w-full gap-2"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.2,
-                    delayChildren: 0.2,
-                    staggerChildren: 0.1,
-                  }}
-                >
-                  {generations
-                    .sort((a, b) => dayjs(b.createdAt).diff(dayjs(a.createdAt)))
-                    .slice(0, isHistoryEnabled ? generations.length : 1)
-                    .map((generation, i) => (
-                      <div
-                        key={i}
-                        className="flex w-full items-center justify-between gap-2 rounded-lg bg-gray-700 px-5 py-2.5 shadow-md"
-                      >
-                        <div className="flex flex-col gap-1">
-                          <p className="text-base font-medium text-gray-50 sm:text-lg">
-                            {generation.expression}
-                          </p>
-                          <p className="text-xs font-medium text-gray-400 sm:text-sm">
-                            {generation.description}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            aria-label="Delete cron"
-                            className="rounded-md bg-gray-800 p-2 transition-colors hover:bg-gray-900/80 active:scale-95 disabled:pointer-events-none disabled:opacity-70"
-                            onClick={() => {
-                              setGenerations((prev) =>
-                                prev.filter((_, j) => i !== j)
-                              );
-                              toast.success("Cron deleted", {
-                                icon: "🗑️",
-                              });
-                            }}
-                          >
-                            <Trash
-                              className="h-4 w-4 text-gray-50"
-                              aria-hidden="true"
-                            />
-                          </button>
-                          <button
-                            aria-label="Copy cron to clipboard"
-                            className="rounded-md bg-gray-800 p-2 transition-colors hover:bg-gray-900/80 active:scale-95 disabled:pointer-events-none disabled:opacity-70"
-                            onClick={() => {
-                              navigator.clipboard.writeText(
-                                generation.expression
-                              );
-                              setIsCopied(true);
-                              toast.success("Cron copied to clipboard", {
-                                icon: "✂️",
-                              });
-                              setTimeout(() => {
-                                setIsCopied(false);
-                              }, 3000);
-                            }}
-                            disabled={isCopied}
-                          >
-                            <Copy
-                              className="h-4 w-4 text-gray-50"
-                              aria-hidden="true"
-                            />
-                          </button>
-                        </div>
+              <motion.div
+                className="mt-1 grid w-full gap-2"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.2,
+                  delayChildren: 0.2,
+                  staggerChildren: 0.1,
+                }}
+              >
+                {generations
+                  .sort((a, b) => dayjs(b.createdAt).diff(dayjs(a.createdAt)))
+                  .slice(0, isHistoryEnabled ? generations.length : 1)
+                  .map((generation, i) => (
+                    <div
+                      key={i}
+                      className="flex w-full items-center justify-between gap-2 rounded-lg bg-gray-700 px-5 py-2.5 shadow-md"
+                    >
+                      <div className="flex flex-col gap-1">
+                        <p className="text-base font-medium text-gray-50 sm:text-lg">
+                          {generation.expression}
+                        </p>
+                        <p className="text-xs font-medium text-gray-400 sm:text-sm">
+                          {generation.description}
+                        </p>
                       </div>
-                    ))}
-                </motion.div>
-              ) : null}
+                      <div className="flex items-center gap-2">
+                        <button
+                          aria-label="Delete cron"
+                          className="rounded-md bg-gray-800 p-2 transition-colors hover:bg-gray-900/80 active:scale-95 disabled:pointer-events-none disabled:opacity-70"
+                          onClick={() => {
+                            setGenerations((prev) =>
+                              prev.filter((_, j) => i !== j)
+                            );
+                            toast.success("Cron deleted", {
+                              icon: "🗑️",
+                            });
+                          }}
+                        >
+                          <Trash
+                            className="h-4 w-4 text-gray-50"
+                            aria-hidden="true"
+                          />
+                        </button>
+                        <button
+                          aria-label="Copy cron to clipboard"
+                          className="rounded-md bg-gray-800 p-2 transition-colors hover:bg-gray-900/80 active:scale-95 disabled:pointer-events-none disabled:opacity-70"
+                          onClick={() => {
+                            navigator.clipboard.writeText(
+                              generation.expression
+                            );
+                            setIsCopied(true);
+                            toast.success("Cron copied to clipboard", {
+                              icon: "✂️",
+                            });
+                            setTimeout(() => {
+                              setIsCopied(false);
+                            }, 3000);
+                          }}
+                          disabled={isCopied}
+                        >
+                          <Copy
+                            className="h-4 w-4 text-gray-50"
+                            aria-hidden="true"
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+              </motion.div>
             </AnimatePresence>
           </motion.div>
         ) : null}

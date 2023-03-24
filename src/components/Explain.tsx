@@ -1,9 +1,9 @@
-import useLocalStorage from "@/hooks/useLocalStorage";
 import Button from "@/components/ui/Button";
 import ToggleInput from "@/components/ui/ToggleInput";
 import { useAppContext } from "@/context/AppProvider";
+import useLocalStorage from "@/hooks/useLocalStorage";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 
@@ -68,6 +68,15 @@ const Explain = () => {
 
     setIsLoading(false);
   };
+
+  // clear local storage
+  useEffect(() => {
+    window.addEventListener("beforeunload", () => localStorage.clear());
+
+    return () => {
+      window.removeEventListener("beforeunload", () => localStorage.clear());
+    };
+  }, []);
 
   return (
     <Fragment>
