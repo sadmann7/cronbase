@@ -1,4 +1,4 @@
-import type { ExplainRequest, OpenAIStreamPayload } from "@/types/globals";
+import type { ExplanationRequest, OpenAIStreamPayload } from "@/types/globals";
 import { openaiStream } from "@/utils/openai";
 
 if (!process.env.OPENAI_API_KEY) {
@@ -11,7 +11,7 @@ export const config = {
   runtime: "edge",
 };
 
-export default async function handler(req: ExplainRequest) {
+export default async function handler(req: ExplanationRequest) {
   const { expression, detailed } = await req.json();
 
   console.log({

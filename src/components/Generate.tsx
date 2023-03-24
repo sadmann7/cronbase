@@ -187,7 +187,7 @@ const CopyButton = ({ data, isCopied, setIsCopied }: CopyButtonProps) => {
   return (
     <button
       aria-label="Copy to clipboard"
-      className="rounded-md bg-gray-800/80 p-2 transition-colors hover:bg-gray-800 disabled:pointer-events-none disabled:opacity-70"
+      className="rounded-md bg-gray-800/80 p-2 transition-colors hover:bg-gray-800 active:scale-95 disabled:pointer-events-none disabled:opacity-70"
       onClick={() => {
         navigator.clipboard.writeText(data);
         setIsCopied(true);

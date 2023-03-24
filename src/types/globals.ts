@@ -27,14 +27,14 @@ export type ChatGPTMessage = {
   content: string;
 };
 
-export interface ExplainRequest extends NextRequest {
+export interface ExplanationRequest extends NextRequest {
   json: () => Promise<{
     expression: string;
     detailed: boolean;
   }>;
 }
 
-export interface GenerateRequest extends NextRequest {
+export interface GenerationRequest extends NextRequest {
   json: () => Promise<{
     description: string;
   }>;
