@@ -1,3 +1,4 @@
+import useLocalStorage from "@/components/hooks/useLocalStorage";
 import Button from "@/components/ui/Button";
 import ToggleInput from "@/components/ui/ToggleInput";
 import { useAppContext } from "@/context/AppProvider";
@@ -13,25 +14,29 @@ const schema = z.object({
       /^((\*|(\d+|\d+\/\d+|\d+-\d+|\d+-\d+\/\d+|\d+,\d+|\d+,\d+\/\d+|\d+-\d+,\d+|\d+-\d+,\d+\/\d+|\d+L|\d+L\/\d+|\d+W|\d+W\/\d+|\d+#\d+|\d+#\d+\/\d+|\d+-\d+L|\d+-\d+L\/\d+|\d+-\d+W|\d+-\d+W\/\d+|\d+-\d+#\d+|\d+-\d+#\d+\/\d+|\d+L-\d+|\d+L-\d+\/\d+|\d+W-\d+|\d+W-\d+\/\d+|\d+#\d+-\d+|\d+#\d+-\d+\/\d+))\s){4}(\*|(\d+|\d+\/\d+|\d+-\d+|\d+-\d+\/\d+|\d+,\d+|\d+,\d+\/\d+|\d+-\d+,\d+|\d+-\d+,\d+\/\d+|\d+L|\d+L\/\d+|\d+W|\d+W\/\d+|\d+#\d+|\d+#\d+\/\d+|\d+-\d+L|\d+-\d+L\/\d+|\d+-\d+W|\d+-\d+W\/\d+|\d+-\d+#\d+|\d+-\d+#\d+\/\d+|\d+L-\d+|\d+L-\d+\/\d+|\d+W-\d+|\d+W-\d+\/\d+|\d+#\d+-\d+|\d+#\d+-\d+\/\d+))$/,
       "Invalid cron expression"
     ),
-  detailed: z.boolean().default(false),
+  detailed: z.boolean().default(true),
 });
 type Inputs = z.infer<typeof schema>;
 
 const Explain = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { explainedData, setExplainedData } = useAppContext();
-  const [isDetailed, setIsDetailed] = useState(false);
+  const [savedData, setSavedData] = useLocalStorage<Inputs>("savedData", {
+    expression: "",
+    detailed: true,
+  });
 
   // react-hook-form
-  const { register, handleSubmit, formState, watch, control, reset } =
-    useForm<Inputs>({
+  const { register, handleSubmit, formState, control, reset } = useForm<Inputs>(
+    {
       resolver: zodResolver(schema),
-    });
+    }
+  );
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     console.log(data);
     setExplainedData("");
     setIsLoading(true);
-    setIsDetailed(data.detailed);
+    setSavedData({ ...data });
     const response = await fetch("/api/explain", {
       method: "POST",
       headers: {
@@ -109,6 +114,7 @@ const Explain = () => {
             control={control}
             name="detailed"
             label="Detailed explanation"
+            defaultChecked={true}
           />
           {formState.errors.detailed ? (
             <p className="-mt-1.5 text-sm font-medium text-red-500">
@@ -127,27 +133,25 @@ const Explain = () => {
         </Button>
       </form>
       {explainedData ? (
-        isDetailed ? (
+        savedData.detailed ? (
           <div className="mt-8 grid w-full place-items-center gap-4 rounded-lg bg-gray-800 p-4">
-            <span className="w-full rounded-md bg-violet-600 px-2 py-3 text-center text-sm font-medium text-white">
-              {watch("expression")}
+            <span className="w-full rounded-md bg-gradient-to-r from-violet-400 to-purple-500 px-2 py-3 text-center text-sm font-medium text-white">
+              {savedData.expression}
             </span>
             <div className="w-full space-y-2">
               {explainedData
                 .split("\n")
                 .map((item) => {
-                  const [character, range, description] = item
+                  const [character, range, meaning] = item
                     .split(" | ")
                     .map((item) => item.trim());
                   return {
                     character,
                     range,
-                    description,
+                    meaning,
                   };
                 })
-                .filter(
-                  (item) => item.character && item.range && item.description
-                )
+                .filter((item) => item.character && item.range && item.meaning)
                 .map((item) => (
                   <div
                     key={crypto.randomUUID()}
@@ -157,15 +161,15 @@ const Explain = () => {
                       {item.character}{" "}
                       <span className="text-gray-400">{item.range}</span>
                     </div>
-                    <p className="text-gray-400">{item.description}</p>
+                    <p className="text-gray-400">{item.meaning}</p>
                   </div>
                 ))}
             </div>
           </div>
         ) : (
           <div className="mt-8 grid w-full place-items-center gap-4 rounded-lg bg-gray-800 p-4">
-            <span className="w-full rounded-md bg-violet-600 px-2 py-3 text-center text-sm font-medium text-white">
-              {watch("expression")}
+            <span className="w-full rounded-md bg-gradient-to-r from-violet-400 to-purple-500 px-2 py-3 text-center text-sm font-medium text-white">
+              {savedData.expression}
             </span>
             <div className="w-full space-y-2">{explainedData}</div>
           </div>
@@ -176,12 +180,3 @@ const Explain = () => {
 };
 
 export default Explain;
-
-type ExplanationCardProps = {
-  expression: string;
-  data: {
-    character: string;
-    range: string;
-    description: string;
-  }[];
-};
